@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" width="1200" height="400">
+  <rect width="1200" height="400" fill="#0F0C29"/>
+  <image href="nebula-pdf-icon.svg" x="60" y="60" width="280" height="280"/>
+  <defs>
+    <linearGradient id="t" x1="0" x2="1">
+      <stop offset="0" stop-color="#00E0FF"/><stop offset="1" stop-color="#FF4FD8"/>
+    </linearGradient>
+  </defs>
+  <text x="390" y="225" font-family="Poppins, 'Segoe UI', Arial, sans-serif" font-weight="700" font-size="128" fill="#FFFFFF">Nebula <tspan fill="url(#t)">PDF</tspan></text>
+  <text x="396" y="290" font-family="Poppins, 'Segoe UI', Arial, sans-serif" font-size="40" fill="#B9B3E6">Traduce tus PDF de inglés a español</text>
+</svg>
