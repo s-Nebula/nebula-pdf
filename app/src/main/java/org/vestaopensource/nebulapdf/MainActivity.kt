@@ -135,7 +135,7 @@ fun AppIcon(modifier: Modifier = Modifier) {
     Box(
         modifier
             .clip(RoundedCornerShape(22))
-            .background(Brush.linearGradient(listOf(Color(0xFF0F0C29), Color(0xFF6A2C91), Color(0xFF302B63))))
+            .background(Brush.verticalGradient(listOf(Color(0xFF6CB3FF), Color(0xFF2F74E6), Color(0xFF1846B8))))
     ) {
         Image(painterResource(R.drawable.ic_launcher_foreground), null, Modifier.fillMaxSize())
     }

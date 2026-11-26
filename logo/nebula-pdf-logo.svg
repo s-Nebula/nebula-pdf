@@ -1,11 +1,27 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" width="1200" height="400">
-  <rect width="1200" height="400" fill="#0F0C29"/>
-  <image href="nebula-pdf-icon.svg" x="60" y="60" width="280" height="280"/>
   <defs>
-    <linearGradient id="t" x1="0" x2="1">
-      <stop offset="0" stop-color="#00E0FF"/><stop offset="1" stop-color="#FF4FD8"/>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="400" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3A86F0"/><stop offset="0.08" stop-color="#2B6FE3"/>
+      <stop offset="0.92" stop-color="#1E55CC"/><stop offset="1" stop-color="#163F9E"/>
     </linearGradient>
+    <linearGradient id="shine" x1="0" y1="0" x2="0" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.28"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="green" x1="0" y1="300" x2="0" y2="352" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#6DC35F"/><stop offset="0.5" stop-color="#3C9E35"/><stop offset="1" stop-color="#2F8A2A"/>
+    </linearGradient>
+    <filter id="ts" x="-5%" y="-5%" width="110%" height="120%">
+      <feDropShadow dx="4" dy="4" stdDeviation="2" flood-color="#0A1E6E" flood-opacity="0.85"/>
+    </filter>
+    <filter id="is" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="6" dy="8" stdDeviation="6" flood-color="#06164F" flood-opacity="0.55"/>
+    </filter>
   </defs>
-  <text x="390" y="225" font-family="Poppins, 'Segoe UI', Arial, sans-serif" font-weight="700" font-size="128" fill="#FFFFFF">Nebula <tspan fill="url(#t)">PDF</tspan></text>
-  <text x="396" y="290" font-family="Poppins, 'Segoe UI', Arial, sans-serif" font-size="40" fill="#B9B3E6">Traduce tus PDF de inglés a español</text>
+  <rect width="1200" height="400" rx="28" fill="url(#sky)"/>
+  <rect width="1200" height="200" rx="28" fill="url(#shine)"/>
+  <rect x="0" y="0" width="1200" height="400" rx="28" fill="none" stroke="#0831D9" stroke-width="6"/>
+  <g filter="url(#is)"><image href="nebula-pdf-icon.svg" x="60" y="60" width="260" height="260" style="clip-path: inset(0 round 46px)"/></g>
+  <text x="370" y="205" font-family="'Trebuchet MS', 'Franklin Gothic Medium', Arial, sans-serif" font-weight="700" font-style="italic" font-size="124" fill="#FFFFFF" filter="url(#ts)">Nebula PDF</text>
+  <rect x="372" y="250" width="740" height="62" rx="31" fill="url(#green)" stroke="#1F6B1A" stroke-width="2"/>
+  <text x="742" y="292" text-anchor="middle" font-family="'Trebuchet MS', Arial, sans-serif" font-weight="700" font-style="italic" font-size="32" fill="#FFFFFF" filter="url(#ts)">Traduce tus PDF de inglés a español</text>
 </svg>
