@@ -106,9 +106,26 @@ class BlockExtractor : PDFTextStripper() {
         if (text.dir != 0f) rotated++
         val gs = graphicsState
         val invisible = gs.textState.renderingMode == RenderingMode.NEITHER
-        val color = try { gs.nonStrokingColor.toRGB() } catch (e: Exception) { 0 }
+        val color = colorOf(gs.nonStrokingColor)
         extras[text] = Extra(color, invisible)
         super.processTextPosition(text)
+    }
+
+    /** Color de relleno en RGB; si el espacio de color no se puede convertir, se aproxima por componentes. */
+    private fun colorOf(c: com.tom_roush.pdfbox.pdmodel.graphics.color.PDColor?): Int {
+        if (c == null) return 0
+        try { return c.toRGB() and 0xFFFFFF } catch (e: Exception) { }
+        val v = try { c.components } catch (e: Exception) { return 0 }
+        fun b(x: Float) = (x.coerceIn(0f, 1f) * 255).toInt()
+        return when (v.size) {
+            1 -> b(v[0]).let { (it shl 16) or (it shl 8) or it }
+            3 -> (b(v[0]) shl 16) or (b(v[1]) shl 8) or b(v[2])
+            4 -> {
+                val k = 1 - v[3]
+                (b((1 - v[0]) * k) shl 16) or (b((1 - v[1]) * k) shl 8) or b((1 - v[2]) * k)
+            }
+            else -> 0
+        }
     }
 
     override fun writeString(text: String, textPositions: MutableList<TextPosition>) {
@@ -171,7 +188,7 @@ class BlockExtractor : PDFTextStripper() {
             val l = last
             if (l != null) {
                 val gap = g.xDirAdj - (l.xDirAdj + l.widthDirAdj)
-                if (pendingSpace || gap > size(l) * 0.15f) sb.append(' ')
+                if (pendingSpace || gap > size(l) * 0.5f) sb.append(' ')
             }
             sb.append(g.unicode)
             last = g

@@ -50,4 +50,28 @@ class TermProtectorTest {
     @Test fun joinsHyphenatedLines() {
         assertEquals("vulnerability assessment", TextCleaner.join(listOf("vulner-", "ability assessment")))
     }
+
+    @Test fun keepsProgrammingLanguageNames() {
+        val p = protector.protect("Start learning modern C++23 and C# today.")
+        assertTrue(p.saved.contains("C++23"))
+        assertTrue(p.saved.contains("C#"))
+    }
+
+    @Test fun restoresPlaceholdersWithMissingBraces() {
+        val p = protector.protect("The editor of the ACCU magazine.")
+        val translated = p.text.replace("{{0}}", "{0}}")
+        assertTrue(protector.restore(translated, p.saved).contains("ACCU"))
+        assertFalse(protector.restore(translated, p.saved).contains("{"))
+    }
+
+    @Test fun keepsOriginalBraceNumbers() {
+        val text = "Use {0} as the first argument."
+        assertEquals(text, roundTrip(text))
+    }
+
+    @Test fun numbersAndPricesAreNotTranslated() {
+        assertFalse(TextCleaner.isTranslatable("US $59.99 CAN $74.99"))
+        assertFalse(TextCleaner.isTranslatable("ISBN: 978-1-098-17814-7"))
+        assertTrue(TextCleaner.isTranslatable("Foreword by Kevlin Henney"))
+    }
 }

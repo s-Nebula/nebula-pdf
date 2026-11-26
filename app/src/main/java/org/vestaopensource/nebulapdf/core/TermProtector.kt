@@ -47,7 +47,12 @@ object TextCleaner {
     }
 
     /** ¿Tiene letras que valga la pena traducir? */
-    fun isTranslatable(text: String): Boolean = text.count { it.isLetter() } >= 2
+    fun isTranslatable(text: String): Boolean {
+        val letters = text.count { it.isLetter() }
+        val visible = text.count { !it.isWhitespace() }
+        // precios, ISBN, números de página, fechas…: casi todo son números o símbolos
+        return letters >= 2 && letters >= visible * 0.4f
+    }
 }
 
 /**
@@ -66,6 +71,7 @@ class TermProtector(glossary: Collection<String>) {
 
     /** Patrones técnicos que nunca se traducen. */
     private val technical = listOf(
+        Regex("""\{+\s*\d+\s*\}+"""), // llaves con números del original (no confundir con marcadores)
         Regex("""(?:https?|ftp|ssh|smb|ldap|file)://\S+|www\.\S+"""),
         Regex("""[\w.+-]+@[\w-]+(?:\.[\w-]+)+"""),
         Regex("""\b(?:CVE|CWE|CAPEC|GHSA|MS\d{2})-[\w-]+""", RegexOption.IGNORE_CASE),
@@ -87,6 +93,8 @@ class TermProtector(glossary: Collection<String>) {
         Regex("""\b[\w-]+\.(?:exe|dll|sys|py|sh|ps1|psm1|bat|cmd|vbs|txt|php|aspx?|jsp|js|ts|html?|conf|cfg|ini|xml|json|ya?ml|c|h|cpp|java|jar|class|apk|dex|elf|bin|so|zip|tar|gz|7z|pdf|docx?|xlsx?|db|sqlite|sql|log|rb|go|pl|rs|kt|pem|crt|key|pcap|pcapng)\b""", RegexOption.IGNORE_CASE),
         Regex("""\b[\w-]+(?:\.[\w-]+)*\.(?:com|org|net|io|local|corp|lan|gov|edu|co|htb|thm)\b"""), // dominios
         Regex("""`[^`\n]+`"""),
+        Regex("""(?<![\w+#])[A-Za-z][\w]*(?:\+\+|#)\w*"""), // C++, C++23, C#, F#
+        Regex("""(?<!\w)\.NET\b|\bNode\.js\b|\bVue\.js\b|\bNext\.js\b"""),
     )
 
     private val acronym = Regex("""\b[A-Z][A-Z0-9&]{1,7}(?:-[A-Z0-9]+)*s?\b""")
@@ -131,7 +139,7 @@ class TermProtector(glossary: Collection<String>) {
     }
 
     companion object {
-        private val PLACEHOLDER = Regex("""\{\s*\{\s*(\d+)\s*\}\s*\}""")
+        private val PLACEHOLDER = Regex("""\{+\s*(\d+)\s*\}+""")
 
         /** Glosario por defecto para libros de ciberseguridad. */
         val DEFAULT_GLOSSARY = """

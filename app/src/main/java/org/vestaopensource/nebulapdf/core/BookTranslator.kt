@@ -103,6 +103,6 @@ class BookTranslator(
     }
 
     private companion object {
-        val PLACEHOLDER = Regex("""\{\{\d+\}\}""")
+        val PLACEHOLDER = Regex("""\{+\s*\d+\s*\}+""")
     }
 }

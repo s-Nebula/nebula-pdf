@@ -131,23 +131,35 @@ class PageRewriter(private val doc: PDDocument) {
         val base = b.fontSize
         val lines = b.lines
         var firstX = lines.first().x0
-        val restX = if (lines.size > 1) lines[1].x0 else firstX
+        var restX = if (lines.size > 1) lines[1].x0 else firstX
         var left = min(firstX, restX)
         var right = b.x1
         val ratio = b.leadingRatio
         val single = lines.size == 1
         val centered = isCentered(b, pageW)
+        val rightAligned = !centered && isRightAligned(b)
 
-        // Los títulos de una sola línea pueden crecer a lo ancho (el español suele ser más largo)
+        // Los renglones sueltos (títulos, etiquetas) pueden crecer a lo ancho hasta el bloque vecino
         if (single) {
+            val sameRow = all.map { it.source }.filter { it !== b && it.top < b.bottom && it.bottom > b.top }
+            val maxRight = min(pageW - 18f, sameRow.filter { it.x0 >= b.x1 - 1f }.minOfOrNull { it.x0 - 6f } ?: Float.MAX_VALUE)
+            val minLeft = max(18f, sameRow.filter { it.x1 <= b.x0 + 1f }.maxOfOrNull { it.x1 + 6f } ?: 0f)
             val need = Fonts.width(font, text, base) - (right - left)
             if (need > 0) {
-                if (centered) {
-                    val half = need / 2
-                    left = max(18f, left - half); right = min(pageW - 18f, right + half)
-                } else right = min(pageW - 18f, right + need)
+                when {
+                    centered -> { left = max(minLeft, left - need / 2); right = min(maxRight, right + need / 2) }
+                    rightAligned -> left = max(minLeft, left - need)
+                    else -> right = min(maxRight, right + need)
+                }
             }
             firstX = left
+        } else if (rightAligned) {
+            // Bloques alineados a la derecha (subtítulos de portada): pueden crecer hacia la izquierda
+            val sameRows = all.map { it.source }.filter { it !== b && it.top < b.bottom && it.bottom > b.top && it.x1 <= b.x0 + 1f }
+            val minLeft = max(18f, sameRows.maxOfOrNull { it.x1 + 6f } ?: 0f)
+            left = max(minLeft, b.x1 - (b.x1 - left) * 1.35f)
+            firstX = left
+            restX = left
         }
 
         // Alto disponible: hasta el siguiente bloque de la misma columna o el margen inferior
@@ -161,7 +173,13 @@ class PageRewriter(private val doc: PDDocument) {
         // Busca el tamaño de letra más grande que quepa (mínimo 60 % del original)
         var size = base
         var wrapped: List<String>
-        while (true) {
+        if (single) {
+            // Un renglón sigue siendo un renglón: se reduce la letra en vez de partirlo
+            val line = text.replace('\n', ' ')
+            val w = Fonts.width(font, line, base)
+            if (w > right - left && w > 0) size = max(base * (right - left) / w, base * 0.45f)
+            wrapped = listOf(line)
+        } else while (true) {
             wrapped = wrap(font, text, size, right - firstX.coerceAtLeast(left), right - restX.coerceAtLeast(left))
             val h = size * 0.85f + (wrapped.size - 1) * size * ratio + size * 0.25f
             if (h <= availH || size <= max(base * 0.6f, 4f)) break
@@ -178,6 +196,7 @@ class PageRewriter(private val doc: PDDocument) {
             val w = Fonts.width(font, line, size)
             val x = when {
                 centered -> (if (single) (left + right) / 2 else (b.x0 + b.x1) / 2) - w / 2
+                rightAligned -> right - w
                 else -> x0
             }
             val y = firstBaseline + i * size * ratio
@@ -190,6 +209,13 @@ class PageRewriter(private val doc: PDDocument) {
         }
         cs.setWordSpacing(0f)
         cs.endText()
+    }
+
+    private fun isRightAligned(b: TextBlock): Boolean {
+        val lines = b.lines
+        if (lines.size < 2) return false
+        val varied = lines.maxOf { it.x0 } - lines.minOf { it.x0 } > b.fontSize
+        return varied && lines.all { b.x1 - it.x1 < b.fontSize * 0.4f }
     }
 
     private fun isCentered(b: TextBlock, pageW: Float): Boolean {
