@@ -70,7 +70,7 @@ También puedes abrir el **menú Inicio** de la barra de tareas para ir a *Mis t
 Cada cambio en la rama `main` se compila automáticamente con GitHub Actions.
 
 - **Última compilación:** entra en [Actions](https://github.com/s-Nebula/nebula-pdf/actions/workflows/build.yml), abre la ejecución más reciente y descarga el artefacto **NebulaPDF-apk**. Dentro está `NebulaPDF-debug.apk`.
-- **Versiones publicadas:** cuando se crea una etiqueta `v1.0.0`, `v1.1.0`, etc., el APK aparece en [Releases](https://github.com/s-Nebula/nebula-pdf/releases).
+- **Versiones publicadas (recomendado):** descarga `NebulaPDF-debug.apk` desde [Releases](https://github.com/s-Nebula/nebula-pdf/releases/latest). Cada vez que se publica una versión nueva (por ejemplo `v1.1.0`), GitHub Actions compila y adjunta el APK automáticamente.
 
 Para instalarlo, copia el APK al teléfono, ábrelo y permite *instalar apps de origen desconocido* cuando Android lo pida. Requiere **Android 8.0 o superior**.
 
